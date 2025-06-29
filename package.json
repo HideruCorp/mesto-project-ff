@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rd /s /q dist && webpack --mode production",
+    "build": "npx rimraf dist && webpack --mode production",
     "dev": "webpack serve --open"
   },
   "repository": {

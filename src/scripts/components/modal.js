@@ -14,3 +14,17 @@ export function closeModal(popup) {
   popup.classList.remove('popup_is-opened');
   document.removeEventListener('keydown', handleEscClose);
 }
+
+export function setPopupEventListeners(popup) {
+  const closeButton = popup.querySelector('.popup__close');
+
+  // Закрытие попапов по кнопке закрытия
+  closeButton.addEventListener('click', () => closeModal(popup));
+
+  // Закрытие попапов по клику на оверлей
+  popup.addEventListener('click', (evt) => {
+    if (evt.target === evt.currentTarget) {
+      closeModal(popup);
+    }
+  });
+}

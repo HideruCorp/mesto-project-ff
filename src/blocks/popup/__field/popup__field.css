@@ -1,0 +1,15 @@
+.popup__field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+  transition: margin-bottom 0.3s ease-in-out;
+}
+
+.popup__field:has(.popup__input-error_active) {
+  margin-bottom: 47px;
+}
+
+.popup__field:last-of-type {
+  margin-bottom: 0;
+}

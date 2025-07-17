@@ -21,10 +21,18 @@ export function setPopupEventListeners(popup) {
   // Закрытие попапов по кнопке закрытия
   closeButton.addEventListener('click', () => closeModal(popup));
 
+  // Предотвращаем восприятие mouseup вне окна за клик по оверлею
+  popup.addEventListener('mousedown', (evt) => {
+    if (evt.target !== evt.currentTarget) {
+      popup.dataset.isMouseDownInside = "true";
+    }
+  });
+
   // Закрытие попапов по клику на оверлей
   popup.addEventListener('click', (evt) => {
-    if (evt.target === evt.currentTarget) {
+    if (evt.target === evt.currentTarget && evt.target.dataset.isMouseDownInside !== "true") {
       closeModal(popup);
     }
+    evt.target.dataset.isMouseDownInside = "";
   });
 }

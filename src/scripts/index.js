@@ -1,6 +1,6 @@
 import '../pages/index.css';
-import { initialCards } from './cards';
 import { createCard, deleteCard } from './components/card.js';
+import { getUserInfo, getInitialCards } from './api.js';
 import { openModal, closeModal, setPopupEventListeners } from './components/modal.js';
 import { enableValidation, clearValidation } from './validation.js';
 
@@ -39,6 +39,10 @@ const validationConfig = {
   }
 };
 
+const userData = {
+  _id: ''
+};
+
 // Открытие попапов
 editProfileButton.addEventListener('click', () => {
   nameInput.value = profileTitle.textContent;
@@ -74,7 +78,7 @@ function handleAddCardFormSubmit(evt) {
     name: placeNameInput.value,
     link: linkInput.value
   };
-  const cardElement = createCard(cardData, { deleteCard, handleImageClick, handleLikeClick });
+  const cardElement = createCard(cardData, { currentUserId: userData._id, deleteCard, handleImageClick, handleLikeClick });
   placesCardContainer.prepend(cardElement);
   evt.target.reset();
   closeModal(popupAddCard);
@@ -93,10 +97,19 @@ function handleLikeClick(evt) {
   evt.target.classList.toggle('card__like-button_is-active');
 }
 
-// Вывести карточки на страницу
-initialCards.forEach(function (cardData) {
-  const cardElement = createCard(cardData, { deleteCard, handleImageClick, handleLikeClick });
-  placesCardContainer.append(cardElement);
-});
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([userInfoData, cardsData]) => {
+    userData._id = userInfoData._id;
+
+    profileTitle.textContent = userInfoData.name;
+    profileDescription.textContent = userInfoData.about;
+    cardsData.forEach((cardData) => { 
+      const cardElement = createCard(cardData, {deleteCard, handleImageClick, handleLikeClick });
+      placesCardContainer.append(cardElement);
+     });
+  })
+  .catch((err) => {
+    console.error('Ошибка при загрузке данных:', err);
+  });
 
 enableValidation(validationConfig);

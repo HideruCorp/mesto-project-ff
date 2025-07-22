@@ -7,6 +7,37 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
+}
+
+.profile__image-overlay,
+.profile__edit-avatar-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  block-size: 100%;
+  inline-size: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile__image-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.profile__edit-avatar-icon {
+  fill: #fff;
+  z-index: 1; /* Убедимся, что иконка над оверлеем */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px; /* Увеличиваем размер иконки */
+  height: 26px; /* Увеличиваем размер иконки */
+}
+
+.profile__image:hover .profile__image-overlay,
+.profile__image:hover .profile__edit-avatar-icon {
+  opacity: 1;
 }
 
 @media screen and (max-width: 740px) {

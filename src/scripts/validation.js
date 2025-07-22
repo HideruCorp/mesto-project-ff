@@ -1,16 +1,107 @@
+const urlValidationCache = new Map();
+
+function debounce(func, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 const showInputError = (formElement, inputElement, { inputErrorClass, errorActiveClass }) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   inputElement.classList.add(inputErrorClass);
-  errorElement.textContent = inputElement.validationMessage;
+  errorElement.textContent = inputElement.validationMessage || inputElement.dataset.errorMessage || 'Неизвестная ошибка';
   errorElement.classList.add(errorActiveClass);
 };
 
 const hideInputError = (formElement, inputElement, { inputErrorClass, errorActiveClass }) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   inputElement.classList.remove(inputErrorClass);
-  errorElement.classList.remove(errorActiveClass);
-  errorElement.textContent = '';
+  if (errorElement) {
+    errorElement.classList.remove(errorActiveClass);
+    errorElement.textContent = '';
+  }
 };
+
+const validateImageMimeType = async (url) => {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    if (!response.ok) {
+      return false;
+    }
+    const contentType = response.headers.get('Content-Type');
+    return contentType && contentType.startsWith('image/');
+  } catch (error) {
+    console.error('Ошибка при проверке MIME-типа:', error);
+    return false;
+  }
+};
+
+// Функция для асинхронной валидации URL изображений
+const validateImageInput = (formElement, inputElement, config) => {
+  const url = inputElement.value.trim();
+  const inputList = Array.from(formElement.querySelectorAll(config.input.inputSelector));
+  const buttonElement = formElement.querySelector(config.submitButton.buttonSelector);
+
+  // Если URL пустой или поле невалидно по другим причинам, пропускаем асинхронную проверку
+  if (!url || inputElement.validity.typeMismatch || inputElement.validity.valueMissing) {
+    inputElement.setCustomValidity("");
+    return Promise.resolve();
+  }
+
+  // Проверяем кэш
+  const cachedResult = urlValidationCache.get(url);
+  if (cachedResult !== undefined) {
+    const errorMessage = cachedResult ? "" : (inputElement.dataset.errorMessage || "URL не ведет на изображение");
+    inputElement.setCustomValidity(errorMessage);
+    
+    if (!cachedResult) {
+      showInputError(formElement, inputElement, config.input);
+    } else {
+      hideInputError(formElement, inputElement, config.input);
+    }
+    
+    toggleButtonState(inputList, buttonElement, config.submitButton);
+    return Promise.resolve(cachedResult);
+  }
+
+  // Блокируем кнопку на время проверки
+  buttonElement.disabled = true;
+  buttonElement.classList.add(config.submitButton.buttonInactiveClass);
+
+  return validateImageMimeType(url)
+    .then(isValid => {
+      // Кэшируем результат
+      urlValidationCache.set(url, isValid);
+      
+      const errorMessage = isValid ? "" : (inputElement.dataset.errorMessage || "URL не ведет на изображение");
+      inputElement.setCustomValidity(errorMessage);
+      
+      if (!isValid) {
+        showInputError(formElement, inputElement, config.input);
+      } else {
+        hideInputError(formElement, inputElement, config.input);
+      }
+      
+      return isValid;
+    })
+    .catch(() => {
+      // При ошибке сети считаем URL невалидным
+      urlValidationCache.set(url, false);
+      const errorMessage = inputElement.dataset.errorMessage || "Ошибка проверки URL";
+      inputElement.setCustomValidity(errorMessage);
+      showInputError(formElement, inputElement, config.input);
+      return false;
+    })
+    .finally(() => {
+      // Обновляем состояние кнопки после проверки
+      toggleButtonState(inputList, buttonElement, config.submitButton);
+    });
+};
+
+// Создаем debounced версию функции
+const debouncedValidateImageInput = debounce(validateImageInput, 500);
 
 const checkInputValidity = (formElement, inputElement, inputConfig) => {
   if (inputElement.validity.patternMismatch && inputElement.value.length > 0 && inputElement.value.trim().length === 0) {
@@ -54,7 +145,14 @@ const setEventListeners = (formElement, config) => {
   inputList.forEach((inputElement) => {
     inputElement.addEventListener('input', () => {
       checkInputValidity(formElement, inputElement, config.input);
-      toggleButtonState(inputList, buttonElement, config.submitButton);
+      
+      // Проверяем, является ли это полем для URL изображения
+      if (inputElement.type === 'url' && inputElement.classList.contains('popup__input_type_url--image')) {
+        debouncedValidateImageInput(formElement, inputElement, config);
+      } else {
+        // Для обычных полей сразу обновляем состояние кнопки
+        toggleButtonState(inputList, buttonElement, config.submitButton);
+      }
     });
   });
 };

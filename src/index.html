@@ -16,10 +16,12 @@
     </header>
     <main class="content">
       <section class="profile page__section">
-        <div class="profile__image" style="background-image: url('<%=require('./images/avatar.jpg')%>');">
-          <div class="profile__image-overlay"></div>
-          <img src="<%=require('./images/edit-icon.svg')%>" alt="Редактировать аватар"
-            class="profile__edit-avatar-icon">
+        <div class="profile__image-container">
+          <img class="profile__image" src="<%=require('./images/avatar.jpg')%>" alt="Аватар пользователя">
+          <div class="profile__image-overlay">
+            <img src="<%=require('./images/edit-icon.svg')%>" alt="Редактировать аватар"
+              class="profile__edit-avatar-icon">
+          </div>
         </div>
         <div class="profile__info">
           <h1 class="profile__title">Жак-Ив Кусто</h1>

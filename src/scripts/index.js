@@ -9,7 +9,8 @@ const placesCardContainer = document.querySelector('.places__list');
 
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
-const profileImage = document.querySelector('.profile__image');
+const profileImageContainer = document.querySelector('.profile__image-container');
+const profileImage = profileImageContainer.querySelector('.profile__image');
 
 const popupEditAvatar = document.querySelector('.popup_type_edit-avatar');
 const formEditAvatar = document.forms['edit-avatar'];
@@ -59,13 +60,13 @@ editProfileButton.addEventListener('click', () => {
   clearValidation(popupEditProfile, validationConfig);
   openModal(popupEditProfile);
 });
-addCardButton.addEventListener('click', () => {+
+addCardButton.addEventListener('click', () => {
   formAddCard.reset();
   clearValidation(popupAddCard, validationConfig);
   openModal(popupAddCard);
 });
 
-profileImage.addEventListener('click', () => {
+profileImageContainer.addEventListener('click', () => {
     formEditAvatar.reset();
     avatarLinkInput.value = profileImage.src;
     clearValidation(popupEditAvatar, validationConfig);

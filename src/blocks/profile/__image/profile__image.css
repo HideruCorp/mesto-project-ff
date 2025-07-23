@@ -1,13 +1,19 @@
-.profile__image {
-  width: 120px;
-  height: 120px;
+.profile__image-container {
+  position: relative;
+  margin: 0 29px 0 0;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  margin: 0 29px 0 0;
-  position: relative;
+  overflow: hidden;
+  inline-size: 120px;
+  block-size: 120px;
+}
+
+.profile__image {
+  object-fit: cover;
+  object-position: center;
+  inline-size: 100%;
+  block-size: 100%;
 }
 
 .profile__image-overlay,
@@ -15,10 +21,11 @@
   position: absolute;
   top: 0;
   left: 0;
-  block-size: 100%;
-  inline-size: 100%;
   opacity: 0;
   transition: opacity 0.3s ease;
+  cursor: pointer;
+  block-size: 100%;
+  inline-size: 100%;
 }
 
 .profile__image-overlay {
@@ -26,28 +33,27 @@
 }
 
 .profile__edit-avatar-icon {
-  fill: #fff;
-  z-index: 1; /* Убедимся, что иконка над оверлеем */
-  left: 50%;
   top: 50%;
+  left: 50%;
+  z-index: 1;
   transform: translate(-50%, -50%);
-  width: 26px; /* Увеличиваем размер иконки */
-  height: 26px; /* Увеличиваем размер иконки */
+  inline-size: 26px;
+  block-size: 26px;
 }
 
-.profile__image:hover .profile__image-overlay,
-.profile__image:hover .profile__edit-avatar-icon {
+.profile__image-container:hover .profile__image-overlay,
+.profile__image-container:hover .profile__edit-avatar-icon {
   opacity: 1;
 }
 
 @media screen and (max-width: 740px) {
-  .profile__image {
+  .profile__image-container {
     margin: 0 10px 0 0;
   }
 }
 
 @media screen and (max-width: 480px) {
-  .profile__image {
+  .profile__image-container {
     margin-right: 0;
   }
 }

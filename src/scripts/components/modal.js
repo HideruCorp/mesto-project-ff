@@ -17,6 +17,7 @@ export function closeModal(popup) {
 
 export function setPopupEventListeners(popup) {
   const closeButton = popup.querySelector('.popup__close');
+  let isMouseDownInside = false;
 
   // Закрытие попапов по кнопке закрытия
   closeButton.addEventListener('click', () => closeModal(popup));
@@ -24,15 +25,15 @@ export function setPopupEventListeners(popup) {
   // Предотвращаем восприятие mouseup вне окна за клик по оверлею
   popup.addEventListener('mousedown', (evt) => {
     if (evt.target !== evt.currentTarget) {
-      popup.dataset.isMouseDownInside = "true";
+      isMouseDownInside = true;
     }
   });
 
   // Закрытие попапов по клику на оверлей
   popup.addEventListener('click', (evt) => {
-    if (evt.target === evt.currentTarget && evt.target.dataset.isMouseDownInside !== "true") {
+    if (evt.target === evt.currentTarget && !isMouseDownInside) {
       closeModal(popup);
     }
-    evt.target.dataset.isMouseDownInside = "";
+    isMouseDownInside = false;
   });
 }

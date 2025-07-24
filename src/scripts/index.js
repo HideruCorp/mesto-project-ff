@@ -1,8 +1,8 @@
 import '../pages/index.css';
 import { createCardNode, updateCardLikes } from './components/card.js';
-import { getUserInfo, getInitialCards, patchUserInfo, postNewCard, deleteCard, putLike, deleteLike, patchUserAvatar } from './api.js';
+import { getUserInfo, getInitialCards, patchUserInfo, postNewCard, deleteCard, putLike, deleteLike, patchUserAvatar } from './components/api.js';
 import { openModal, closeModal, setPopupEventListeners } from './components/modal.js';
-import { enableValidation, clearValidation } from './validation.js';
+import { enableValidation, clearValidation } from './components/validation.js';
 
 // DOM узлы
 const placesCardContainer = document.querySelector('.places__list');
@@ -68,7 +68,6 @@ addCardButton.addEventListener('click', () => {
 
 profileImageContainer.addEventListener('click', () => {
     formEditAvatar.reset();
-    avatarLinkInput.value = profileImage.src;
     clearValidation(popupEditAvatar, validationConfig);
     openModal(popupEditAvatar);
 });
@@ -174,9 +173,8 @@ function handleLikeUpdate(cardId, isLiked, cardElement) {
     });
 }
 
-function handleDeleteCardClick(evt) {
+function handleDeleteCardClick(evt, cardId) {
   const cardItem = evt.target.closest('.places__item');
-  const cardId = cardItem.dataset.cardId;
 
   deleteCard(cardId)
     .then(() => {
